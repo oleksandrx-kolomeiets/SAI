@@ -17,6 +17,7 @@ lib_LTLIBRARIES = libsai.la
 libsai_la_SOURCES = \
                        stub_sai_fdb.c \
                        stub_sai_interfacequery.c \
+                       stub_sai_lag.c \
                        stub_sai_neighbor.c \
                        stub_sai_nexthop.c \
                        stub_sai_nexthopgroup.c \
