@@ -71,10 +71,10 @@ int main(void)
     // Create LAG_MEMBER#2 {LAG_ID:LAG#1, PORT_ID:PORT#2}
     sai_object_id_t lag_member2;
     sai_attribute_t lag_member2_attrs[2];
-    lag_member1_attrs[0].id = SAI_LAG_MEMBER_ATTR_LAG_ID;
-    lag_member1_attrs[0].value.oid = lag1;
-    lag_member1_attrs[1].id = SAI_LAG_MEMBER_ATTR_PORT_ID;
-    lag_member1_attrs[1].value.oid = ports[1];
+    lag_member2_attrs[0].id = SAI_LAG_MEMBER_ATTR_LAG_ID;
+    lag_member2_attrs[0].value.oid = lag1;
+    lag_member2_attrs[1].id = SAI_LAG_MEMBER_ATTR_PORT_ID;
+    lag_member2_attrs[1].value.oid = ports[1];
     status = lag_api->create_lag_member(&lag_member2, 2, lag_member2_attrs);
     assert(status == SAI_STATUS_SUCCESS);
 
@@ -86,20 +86,20 @@ int main(void)
     // Create LAG_MEMBER#3 {LAG_ID:LAG#2, PORT_ID:PORT#3}
     sai_object_id_t lag_member3;
     sai_attribute_t lag_member3_attrs[2];
-    lag_member1_attrs[0].id = SAI_LAG_MEMBER_ATTR_LAG_ID;
-    lag_member1_attrs[0].value.oid = lag2;
-    lag_member1_attrs[1].id = SAI_LAG_MEMBER_ATTR_PORT_ID;
-    lag_member1_attrs[1].value.oid = ports[2];
+    lag_member3_attrs[0].id = SAI_LAG_MEMBER_ATTR_LAG_ID;
+    lag_member3_attrs[0].value.oid = lag2;
+    lag_member3_attrs[1].id = SAI_LAG_MEMBER_ATTR_PORT_ID;
+    lag_member3_attrs[1].value.oid = ports[2];
     status = lag_api->create_lag_member(&lag_member3, 2, lag_member3_attrs);
     assert(status == SAI_STATUS_SUCCESS);
 
     // Create LAG_MEMBER#4 {LAG_ID:LAG#2, PORT_ID:PORT#4}
     sai_object_id_t lag_member4;
     sai_attribute_t lag_member4_attrs[2];
-    lag_member1_attrs[0].id = SAI_LAG_MEMBER_ATTR_LAG_ID;
-    lag_member1_attrs[0].value.oid = lag2;
-    lag_member1_attrs[1].id = SAI_LAG_MEMBER_ATTR_PORT_ID;
-    lag_member1_attrs[1].value.oid = ports[3];
+    lag_member4_attrs[0].id = SAI_LAG_MEMBER_ATTR_LAG_ID;
+    lag_member4_attrs[0].value.oid = lag2;
+    lag_member4_attrs[1].id = SAI_LAG_MEMBER_ATTR_PORT_ID;
+    lag_member4_attrs[1].value.oid = ports[3];
     status = lag_api->create_lag_member(&lag_member4, 2, lag_member4_attrs);
     assert(status == SAI_STATUS_SUCCESS);
 
@@ -111,6 +111,9 @@ int main(void)
     lag1_ports_attr.value.objlist.count = 2;
     status = lag_api->get_lag_attribute(lag1, 1, &lag1_ports_attr);
     assert(status == SAI_STATUS_SUCCESS);
+    assert(lag1_ports_attr.value.objlist.count == 2);
+    assert(lag1_ports_attr.value.objlist.list[0] == ports[0]);
+    assert(lag1_ports_attr.value.objlist.list[1] == ports[1]);
 
     // Get LAG#2 PORT_LIST [Expected: (PORT#3, PORT#4)]
     sai_object_id_t lag2_ports[2];
@@ -120,18 +123,23 @@ int main(void)
     lag2_ports_attr.value.objlist.count = 2;
     status = lag_api->get_lag_attribute(lag2, 1, &lag2_ports_attr);
     assert(status == SAI_STATUS_SUCCESS);
+    assert(lag2_ports_attr.value.objlist.count == 2);
+    assert(lag2_ports_attr.value.objlist.list[0] == ports[2]);
+    assert(lag2_ports_attr.value.objlist.list[1] == ports[3]);
 
     // Get LAG_MEMBER#1 LAG_ID [Expected: LAG#1]
     sai_attribute_t lag_member1_lag_id_attr;
     lag_member1_lag_id_attr.id = SAI_LAG_MEMBER_ATTR_LAG_ID;
     status = lag_api->get_lag_member_attribute(lag_member1, 1, &lag_member1_lag_id_attr);
     assert(status == SAI_STATUS_SUCCESS);
+    assert(lag_member1_lag_id_attr.value.oid == lag1);
 
     // Get LAG_MEMBER#3 PORT_ID [Expected: PORT#3]
     sai_attribute_t lag_member3_port_id_attr;
     lag_member3_port_id_attr.id = SAI_LAG_MEMBER_ATTR_PORT_ID;
     status = lag_api->get_lag_member_attribute(lag_member3, 1, &lag_member3_port_id_attr);
     assert(status == SAI_STATUS_SUCCESS);
+    assert(lag_member3_port_id_attr.value.oid == ports[2]);
 
     // Remove LAG_MEMBER#2
     status = lag_api->remove_lag_member(lag_member2);
@@ -141,6 +149,8 @@ int main(void)
     lag1_ports_attr.value.objlist.count = 2;
     status = lag_api->get_lag_attribute(lag1, 1, &lag1_ports_attr);
     assert(status == SAI_STATUS_SUCCESS);
+    assert(lag1_ports_attr.value.objlist.count == 1);
+    assert(lag1_ports_attr.value.objlist.list[0] == ports[0]);
 
     // Remove LAG_MEMBER#3
     status = lag_api->remove_lag_member(lag_member3);
@@ -150,6 +160,8 @@ int main(void)
     lag2_ports_attr.value.objlist.count = 2;
     status = lag_api->get_lag_attribute(lag2, 1, &lag2_ports_attr);
     assert(status == SAI_STATUS_SUCCESS);
+    assert(lag2_ports_attr.value.objlist.count == 1);
+    assert(lag2_ports_attr.value.objlist.list[0] == ports[3]);
 
     // Remove LAG_MEMBER#1
     status = lag_api->remove_lag_member(lag_member1);
